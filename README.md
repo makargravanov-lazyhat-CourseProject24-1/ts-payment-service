@@ -1,1 +1,5 @@
 # ts-payment-service
+
+PARENT PROJECT
+
+RUN ONLY WITH ROOT PROJECT
