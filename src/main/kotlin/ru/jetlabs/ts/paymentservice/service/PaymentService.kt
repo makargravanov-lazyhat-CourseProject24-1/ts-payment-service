@@ -40,6 +40,8 @@ class PaymentService {
         if (AgencyBankAccountsBindings.select(emptyList())
                 .where(AgencyBankAccountsBindings.agencyId eq addAgencyBindingRequest.agencyId).count() >= 1
         ) AddAgencyBindingResult.Error.AgencyAlreadyExist(addAgencyBindingRequest.agencyId)
-        else AddAgencyBindingResult.Error.Unknown(e.message ?: "id = ${addAgencyBindingRequest.agencyId}")
+        else AddAgencyBindingResult.Error.Unknown(e.message ?: e.stackTraceToString()).also {
+            LOGGER.error(it.toString(), e)
+        }
     }
 }
