@@ -5,8 +5,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import ru.jetlabs.ts.paymentservice.PaymentServiceApplication
+import ru.jetlabs.ts.paymentservice.models.AgencyBindRequest
 import ru.jetlabs.ts.paymentservice.models.AgencyBindResult
-import ru.jetlabs.ts.paymentservice.rest.AddAgencyBindingRequest
+import ru.jetlabs.ts.paymentservice.models.TransactionStatusHookBody
 import ru.jetlabs.ts.paymentservice.tables.AgencyBankAccountsBindings
 import java.sql.SQLException
 
@@ -18,7 +19,7 @@ class PaymentService {
         val LOGGER = LoggerFactory.getLogger(PaymentServiceApplication::class.java)!!
     }
 
-    fun bindAgency(addAgencyBindingRequest: AddAgencyBindingRequest): AgencyBindResult = try {
+    fun bindAgency(addAgencyBindingRequest: AgencyBindRequest): AgencyBindResult = try {
         AgencyBankAccountsBindings.upsert(where = {
             AgencyBankAccountsBindings.agencyId eq addAgencyBindingRequest.agencyId
         }) {
@@ -31,4 +32,13 @@ class PaymentService {
             LOGGER.error(it.toString(), e)
         }
     }
+
+    fun handleStatus(body: TransactionStatusHookBody): HandleStatusResult {
+
+    }
+}
+
+sealed interface HandleStatusResult {
+    data object Success
+    data class UnknownError(val error: String) : HandleStatusResult
 }

@@ -2,9 +2,13 @@ package ru.jetlabs.ts.paymentservice.rest
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import ru.jetlabs.ts.paymentservice.models.AgencyBindRequest
 import ru.jetlabs.ts.paymentservice.models.AgencyBindResult
+import ru.jetlabs.ts.paymentservice.models.TransactionStatusHookBody
 import ru.jetlabs.ts.paymentservice.service.PaymentService
 
 @RestController
@@ -22,8 +26,9 @@ class PaymentServiceController(
         }
     }
 
-    @GetMapping
-    fun transactionCallback() {
-        TODO()
+    @PostMapping("/transaction-status-hook")
+    fun transactionStatusHook(@RequestBody body: TransactionStatusHookBody): ResponseEntity<*> {
+
     }
 }
+
