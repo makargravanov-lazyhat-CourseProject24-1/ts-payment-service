@@ -11,5 +11,4 @@ object Transactions : UUIDTable("transactions") {
     val amount = float("amount")
     val agencyId = long("agency_id")
     val createdAt = datetime("created_at").clientDefault { LocalDateTime.now() }
-    val longedAt = datetime("longed_at").clientDefault { LocalDateTime.now() }
 }
