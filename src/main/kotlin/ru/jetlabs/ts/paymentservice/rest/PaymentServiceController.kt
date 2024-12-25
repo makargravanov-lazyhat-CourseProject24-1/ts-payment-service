@@ -26,9 +26,17 @@ class PaymentServiceController(
         }
     }
 
+    @PostMapping("/bind-transaction-status")
+    fun registerTransaction()
+
     @PostMapping("/transaction-status-hook")
     fun transactionStatusHook(@RequestBody body: TransactionStatusHookBody): ResponseEntity<*> {
 
     }
 }
+
+data class TransactionRegisterRequestForm(
+    val bookingId
+)
+
 
