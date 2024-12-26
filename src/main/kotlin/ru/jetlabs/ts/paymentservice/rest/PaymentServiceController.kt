@@ -44,7 +44,8 @@ class PaymentServiceController(
             String::class.java
         )
         v.body?.let { paymentService.addTransaction(it, form.agencyId, form.userId, form.amount, form.ticketId) }
-        return ResponseEntity.ok("https://pay.lazyhat.ru/pay/$v")
+        val b = v.body
+        return ResponseEntity.ok("https://pay.lazyhat.ru/pay/$b")
     }
 
     @PostMapping("/transaction-status-hook")
