@@ -46,7 +46,8 @@ class PaymentServiceController(
 
     @PostMapping("/transaction-status-hook")
     fun transactionStatusHook(@RequestBody body: TransactionStatusHookBody): ResponseEntity<*> {
-
+        paymentService.handleStatus(body)
+        return ResponseEntity.ok("Success")
     }
 }
 

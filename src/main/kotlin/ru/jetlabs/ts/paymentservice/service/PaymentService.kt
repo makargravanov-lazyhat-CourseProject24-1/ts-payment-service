@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import ru.jetlabs.ts.paymentservice.PaymentServiceApplication
-import ru.jetlabs.ts.paymentservice.models.AgencyBindRequest
-import ru.jetlabs.ts.paymentservice.models.AgencyBindResult
-import ru.jetlabs.ts.paymentservice.models.GetByIdResult
-import ru.jetlabs.ts.paymentservice.models.TransactionStatusHookBody
+import ru.jetlabs.ts.paymentservice.models.*
 import ru.jetlabs.ts.paymentservice.tables.AgencyBankAccountsBindings
 import ru.jetlabs.ts.paymentservice.tables.Transactions
 import ru.jetlabs.ts.paymentservice.tables.TransactionsStatuses
@@ -57,8 +54,24 @@ class PaymentService {
         }
     }
 
-    fun handleStatus(body: TransactionStatusHookBody): HandleStatusResult {
-
+    fun handleStatus(body: TransactionStatusHookBody): Int {
+        var v =Transactions.select(Transactions.id).where{Transactions.uuid eq body.transactionUuid}.singleOrNull()?.let {
+            GetTransactionByUuidResult.Success(
+                GetTransactionByUuidData(
+                    id = it[Transactions.id].value
+                )
+            )
+        } ?: GetTransactionByUuidResult.NotFound
+        return v.let { t ->
+            when(t){
+                GetTransactionByUuidResult.NotFound -> -1
+                is GetTransactionByUuidResult.Success -> TransactionsStatuses.update(where = {
+                    TransactionsStatuses.transaction eq t.id.id
+                }){
+                    it[status] = body.status
+                }
+            }
+        }
     }
 }
 
