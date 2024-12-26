@@ -1,4 +1,4 @@
-package ru.jetlabs.ts.ticketsservice.db
+package ru.jetlabs.ts.paymentservice.db
 
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.springframework.boot.ApplicationArguments
