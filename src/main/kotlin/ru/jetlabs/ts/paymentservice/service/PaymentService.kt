@@ -45,17 +45,18 @@ class PaymentService {
             )
         } ?: GetByIdResult.NotFound
 
-    fun addTransaction(uuid: String, agencyId: Long, userId: Long, amount: Float) {
+    fun addTransaction(uuid: String, agencyId: Long, userId: Long, amount: Float, ticketId: Long) {
         Transactions.insert {
             it[this.uuid] = uuid
             it[this.agencyId] = agencyId
             it[this.userId] = userId
+            it[this.ticketId] = ticketId
             it[this.amount] = amount
         }
     }
 
     fun handleStatus(body: TransactionStatusHookBody): Int {
-        var v =Transactions.select(Transactions.id).where{Transactions.uuid eq body.transactionUuid}.singleOrNull()?.let {
+        val v =Transactions.select(Transactions.id).where{Transactions.uuid eq body.transactionUuid}.singleOrNull()?.let {
             GetTransactionByUuidResult.Success(
                 GetTransactionByUuidData(
                     id = it[Transactions.id].value

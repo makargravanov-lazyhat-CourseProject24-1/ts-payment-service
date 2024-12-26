@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.RestTemplate
-import ru.jetlabs.ts.paymentservice.models.*
+import ru.jetlabs.ts.paymentservice.models.AgencyBindRequest
+import ru.jetlabs.ts.paymentservice.models.AgencyBindResult
+import ru.jetlabs.ts.paymentservice.models.GetByIdResult
+import ru.jetlabs.ts.paymentservice.models.TransactionStatusHookBody
 import ru.jetlabs.ts.paymentservice.service.PaymentService
 
 @RestController
@@ -27,20 +30,20 @@ class PaymentServiceController(
     }
 
     @PostMapping("/bind-transaction-status")
-    fun registerTransaction(@RequestBody form: TransactionRegisterRequestForm) : ResponseEntity<*>{
+    fun registerTransaction(@RequestBody form: TransactionRegisterRequestForm): ResponseEntity<*> {
         val agencyBankAccount = paymentService.getById(form.agencyId).let {
-            when(it){
+            when (it) {
                 GetByIdResult.NotFound -> ""
                 is GetByIdResult.Success -> it.agencyBindRequest.bankAccountNumber
             }
         }
         if (agencyBankAccount == "") return ResponseEntity.badRequest().body(null)
         val v = restTemplate.postForEntity(
-            "https://acquiring.lazyhat.ru/acquiring-mock-backend/api/v1/register-pay-processing/amount=${form.amount}/to=${agencyBankAccount}/callback-url=https://ts-payment-service/ts-payment-service/api/v1/transaction-status-hook",
-            null,
+            "https://acquiring.lazyhat.ru/acquiring-mock-backend/api/v1/register-pay-processing/amount=${form.amount}/to=${agencyBankAccount}",
+            "http://ts-payment-service:8080/ts-payment-service/api/v1/transaction-status-hook",
             String::class.java
         )
-        v.body?.let { paymentService.addTransaction(it,form.agencyId,form.userId,form.amount) }
+        v.body?.let { paymentService.addTransaction(it, form.agencyId, form.userId, form.amount, form.ticketId) }
         return ResponseEntity.ok("Success")
     }
 
@@ -52,9 +55,10 @@ class PaymentServiceController(
 }
 
 data class TransactionRegisterRequestForm(
-    val amount : Float,
-    val agencyId : Long,
-    val userId : Long
+    val amount: Float,
+    val agencyId: Long,
+    val ticketId: Long,
+    val userId: Long
 )
 
 

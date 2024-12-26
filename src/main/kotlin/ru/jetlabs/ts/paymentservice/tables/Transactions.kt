@@ -16,5 +16,6 @@ object Transactions : IdTable<Long>("transactions") {
     val userId = long("user_id")
     val amount = float("amount")
     val agencyId = long("agency_id")
+    val ticketId = long("ticketId")
     val createdAt = datetime("created_at").clientDefault { LocalDateTime.now() }
 }
