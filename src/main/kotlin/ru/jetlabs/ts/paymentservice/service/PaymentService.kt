@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import ru.jetlabs.ts.paymentservice.PaymentServiceApplication
+import ru.jetlabs.ts.paymentservice.config.TicketFeignClient
 import ru.jetlabs.ts.paymentservice.models.*
 import ru.jetlabs.ts.paymentservice.tables.AgencyBankAccountsBindings
 import ru.jetlabs.ts.paymentservice.tables.Transactions
@@ -15,7 +16,9 @@ import java.sql.SQLException
 
 @Component
 @Transactional
-class PaymentService {
+class PaymentService (
+    val tfc: TicketFeignClient
+){
     companion object {
         val LOGGER = LoggerFactory.getLogger(PaymentServiceApplication::class.java)!!
     }
@@ -59,10 +62,24 @@ class PaymentService {
         val v =Transactions.select(Transactions.id).where{Transactions.uuid eq body.transactionUuid}.singleOrNull()?.let {
             GetTransactionByUuidResult.Success(
                 GetTransactionByUuidData(
-                    id = it[Transactions.id].value
+                    id = it[Transactions.id].value,
+                    ticketId = it[Transactions.ticketId]
                 )
             )
         } ?: GetTransactionByUuidResult.NotFound
+
+        val ticketId = v.let {
+            when(it){
+                is GetTransactionByUuidResult.NotFound -> -1
+                is GetTransactionByUuidResult.Success -> it.id.ticketId
+            }
+        }
+
+        if(body.status==AcquiringTransactionStatus.APPROVED && ticketId!=-1L){
+            tfc.approveTicket(ticketId)
+        }else if(body.status==AcquiringTransactionStatus.EXPIRED && ticketId!=-1L){
+            tfc.cancelTicket(ticketId)
+        }
         return v.let { t ->
             when(t){
                 GetTransactionByUuidResult.NotFound -> -1

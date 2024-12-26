@@ -1,5 +1,6 @@
 package ru.jetlabs.ts.paymentservice.models
 
 data class GetTransactionByUuidData(
-    val id: Long
+    val id: Long,
+    val ticketId: Long
 )
