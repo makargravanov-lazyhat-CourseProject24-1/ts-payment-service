@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 object Transactions : LongIdTable("transactions") {
     val uuid = text("uuid")
     val userId = long("user_id")
-    val amount = float("amount")
+    val amount = double("amount")
     val agencyId = long("agency_id")
     val ticketId = long("ticket_id")
     val createdAt = datetime("created_at").clientDefault { LocalDateTime.now() }

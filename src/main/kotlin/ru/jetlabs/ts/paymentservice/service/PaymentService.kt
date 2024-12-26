@@ -50,7 +50,7 @@ class PaymentService (
             )
         } ?: GetByIdResult.NotFound
 
-    fun addTransaction(uuid: String, agencyId: Long, userId: Long, amount: Float, ticketId: Long) {
+    fun addTransaction(uuid: String, agencyId: Long, userId: Long, amount: Double, ticketId: Long) {
         Transactions.insert {
             it[this.uuid] = uuid
             it[this.agencyId] = agencyId

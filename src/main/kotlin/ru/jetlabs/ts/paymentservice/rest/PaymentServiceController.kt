@@ -56,7 +56,7 @@ class PaymentServiceController(
 }
 
 data class TransactionRegisterRequestForm(
-    val amount: Float,
+    val amount: Double,
     val agencyId: Long,
     val ticketId: Long,
     val userId: Long
