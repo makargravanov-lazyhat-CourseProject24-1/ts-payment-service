@@ -61,17 +61,18 @@ class PaymentService (
     }
 
     fun handleStatus(body: TransactionStatusHookBody): Int {
-        val v =Transactions.select(Transactions.id).where{Transactions.uuid eq body.transactionUuid}.singleOrNull()?.let {
-            GetTransactionByUuidResult.Success(
-                GetTransactionByUuidData(
-                    id = it[Transactions.id].value,
-                    ticketId = it[Transactions.ticketId]
+        val v = Transactions.select(Transactions.id, Transactions.ticketId)
+            .where { Transactions.uuid eq body.transactionUuid }
+            .singleOrNull()?.let {
+                GetTransactionByUuidResult.Success(
+                    GetTransactionByUuidData(
+                        id = it[Transactions.id].value,
+                        ticketId = it[Transactions.ticketId]
+                    )
                 )
-            )
-        } ?: GetTransactionByUuidResult.NotFound
-
+            } ?: GetTransactionByUuidResult.NotFound
         val ticketId = v.let {
-            when(it){
+            when(it) {
                 is GetTransactionByUuidResult.NotFound -> -1
                 is GetTransactionByUuidResult.Success -> it.id.ticketId
             }
